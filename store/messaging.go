@@ -18,14 +18,14 @@ var (
 )
 
 type Storer interface {
-	Create(ctx context.Context, msg *pb.MessageThread) error
-	QueryLog(qr *pb.QueryRequest) ([]*pb.MessageThread, int64, error)
-	GetLog(id string) (*pb.MessageThread, error)
-	Update(id string, ctx context.Context, msg *pb.MessageThread) error
-	DeleteLog(id string) error
+	CreateMsg(ctx context.Context, msg *pb.MessageThread) error
+	QueryMsg(ctx context.Context, qr *pb.QueryRequest) ([]*pb.MessageThread, int64, error)
+	GetMsg(ctx context.Context, id string) (*pb.MessageThread, error)
+	UpdateMsg(id string, ctx context.Context, msg *pb.MessageThread) error
+	DeleteMsg(id string) error
 }
 
-func (s Store) Create(ctx context.Context, msg *pb.MessageThread) error {
+func (s Store) CreateMsg(ctx context.Context, msg *pb.MessageThread) error {
 	_, err := s.locaColl.InsertOne(ctx, msg)
 	if err != nil {
 		log.Fatal(err)
@@ -33,9 +33,9 @@ func (s Store) Create(ctx context.Context, msg *pb.MessageThread) error {
 	return err
 }
 
-func (s Store) QueryLog(qr *pb.QueryRequest) ([]*pb.MessageThread, int64, error) {
-	filter := bson.M{}
+func (s Store) QueryMsg(ctx context.Context, qr *pb.QueryRequest) ([]*pb.MessageThread, int64, error) {
 
+	filter := bson.M{}
 	if qr.SearchText != "" {
 		filter = bson.M{"$text": bson.M{"$search": `"` + qr.SearchText + `"`}}
 	}
@@ -46,14 +46,13 @@ func (s Store) QueryLog(qr *pb.QueryRequest) ([]*pb.MessageThread, int64, error)
 		Sort:  bson.M{"date": -1},
 	}
 
-	ctx := context.Background()
 	cursor, err := s.locaColl.Find(ctx, filter, &opt)
 	if err != nil {
 		return nil, 0, err
 	}
 
 	var msgs []*pb.MessageThread
-	if err := cursor.All(context.Background(), &msgs); err != nil {
+	if err := cursor.All(ctx, &msgs); err != nil {
 		return nil, 0, err
 	}
 
@@ -65,7 +64,7 @@ func (s Store) QueryLog(qr *pb.QueryRequest) ([]*pb.MessageThread, int64, error)
 	return msgs, matches, err
 }
 
-func (s Store) GetLog(id string) (*pb.MessageThread, error) {
+func (s Store) GetMsg(ctx context.Context, id string) (*pb.MessageThread, error) {
 	var msg pb.MessageThread
 
 	if err := s.locaColl.FindOne(context.Background(), bson.M{"id": id}).Decode(&msg); err != nil {
@@ -78,7 +77,7 @@ func (s Store) GetLog(id string) (*pb.MessageThread, error) {
 	return &msg, nil
 }
 
-func (s Store) Update(id string, ctx context.Context, msg *pb.MessageThread) error {
+func (s Store) UpdateMsg(id string, ctx context.Context, msg *pb.MessageThread) error {
 	insertResult, err := s.locaColl.ReplaceOne(ctx, bson.M{"id": id}, msg)
 	if err != nil {
 		log.Fatal(err)
@@ -88,7 +87,7 @@ func (s Store) Update(id string, ctx context.Context, msg *pb.MessageThread) err
 	return err
 }
 
-func (s Store) DeleteLog(id string) error {
+func (s Store) DeleteMsg(id string) error {
 	if _, err := s.locaColl.DeleteOne(context.Background(), bson.M{"id": id}); err != nil {
 		return err
 	}

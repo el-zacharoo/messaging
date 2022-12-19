@@ -341,15 +341,15 @@
     "v1QueryResponse": {
       "type": "object",
       "properties": {
-        "totalCount": {
-          "type": "string",
-          "format": "int64"
-        },
-        "messageThreads": {
+        "cursor": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1MessageThread"
           }
+        },
+        "matches": {
+          "type": "string",
+          "format": "int64"
         }
       },
       "description": "QueryResponse returns a list of messages."
