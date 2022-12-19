@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+package messaging.v1;
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/field_mask.proto";
+
+// The Messaging service provides methods for managing messaging resources.
+service MessagingService {
+    // create a message
+    rpc Create(CreateRequest) returns (CreateResponse) {
+        option (google.api.http) = {
+          post: "/Create"
+          body: "*"
+        };
+    }
+  
+    // list messages
+    rpc Query(QueryRequest) returns (QueryResponse) {
+        option (google.api.http) = {
+          post: "/Query"
+          body: "*"
+        };
+    }
+    // get a message by id
+    rpc Get (GetRequest) returns (GetResponse) {
+        option (google.api.http) = {
+          post: "/Get"
+          body: "*"
+        };
+    }
+ // add more messages
+    rpc Update (UpdateRequest) returns (UpdateResponse) {
+        option (google.api.http) = {
+          post: "/Update"
+          body: "*"
+        };
+    }
+    // delete a message by id
+    rpc Delete (DeleteRequest) returns (DeleteResponse) {
+        option (google.api.http) = {
+          post: "/Delete"
+          body: "*"
+        };
+    }  
+}
+
+// CreateRequest creates a message.
+message CreateRequest {
+    MessageThread message_thread = 1 [(validate.rules).message.required = true];
+}
+// CreateResponse returns a message.
+message CreateResponse {
+    MessageThread message_thread = 1;
+}
+// QueryRequest gets a list of messages.
+message QueryRequest {
+  int64 offset = 1 [ (validate.rules).int64.gte = 0 ];
+  int64 limit = 2 [ (validate.rules).int64.gte = 0 ];
+  string search_text = 3;
+}
+// QueryResponse returns a list of messages.
+message QueryResponse {
+  int64 total_count = 1;
+  repeated MessageThread message_threads = 2;
+}
+
+// GetRequest gets a message by id.
+message GetRequest {
+  string message_id = 1 [ (validate.rules).string.uuid = true ];
+}
+// GetResponse returns a message by id.
+message GetResponse { 
+    MessageThread message_thread = 1; 
+}
+
+// UpdateRequest updates a message.
+message UpdateRequest {
+  string message_id = 1 [ (validate.rules).string.uuid = true ];
+  MessageThread message_thread = 2 [(validate.rules).message.required = true];
+  google.protobuf.FieldMask update_mask = 3 [(validate.rules).message.required = true];
+}
+// UpdateResponse returns a message.
+message UpdateResponse {
+  MessageThread message_thread = 1;
+}
+
+// DeleteRequest deletes a message by id.
+message DeleteRequest {
+  string message_id = 1 [ (validate.rules).string.uuid = true ];
+}
+// DeleteResponse returns an empty response and can be ignored.
+message DeleteResponse {
+    MessageThread message_thread = 1;
+}
+
+//  message threads between users
+message MessageThread {
+    string id = 1;
+    repeated Messages messages = 2;
+    repeated Person person = 3;
+}
+
+// individual messages
+message Messages {
+    string body = 2;
+    string sender = 3;
+    string receiver = 4;
+    int64 date = 5; 
+}
+// people involved in the message thread
+message Person {
+    string id = 1;
+    bool deleted = 2;
+}
