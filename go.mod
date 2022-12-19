@@ -6,6 +6,7 @@ require (
 	buf.build/gen/go/envoyproxy/protoc-gen-validate/protocolbuffers/go v1.28.1-20221025150516-6607b10f00ed.4
 	github.com/bufbuild/connect-go v1.4.0
 	github.com/google/uuid v1.3.0
+	github.com/rs/cors v1.8.2
 	go.mongodb.org/mongo-driver v1.11.1
 	golang.org/x/net v0.4.0
 	google.golang.org/genproto v0.0.0-20221207170731-23e4bf6bdc37
