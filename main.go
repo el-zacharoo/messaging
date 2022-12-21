@@ -21,12 +21,7 @@ func main() {
 		Store: s,
 	}
 
-	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"},
-		AllowedHeaders:   []string{"Access-Control-Allow-Origin", "Content-Type"},
-		AllowedMethods:   []string{"POST"},
-		AllowCredentials: true,
-	})
+	c := setCORS()
 
 	mux := http.NewServeMux()
 	path, h := pbcnn.NewMessagingServiceHandler(svc)
@@ -37,4 +32,14 @@ func main() {
 		port,
 		h2c.NewHandler(handler, &http2.Server{}),
 	)
+}
+
+func setCORS() *cors.Cors {
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedHeaders:   []string{"Access-Control-Allow-Origin", "Content-Type"},
+		AllowedMethods:   []string{"POST"},
+		AllowCredentials: true,
+	})
+	return c
 }
