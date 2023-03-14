@@ -22,8 +22,6 @@ run:
 		--app-id messaging \
 		--app-port 8080 \
 		--app-protocol grpc \
-		--config ./.dapr/config.yaml \
-		--components-path ./.dapr/components \
 		go run .
 
 .PHONY: kill
